@@ -16,11 +16,11 @@
     <p>גיל באבחנה: {{ survey.diagnosis_age }}</p>
     <p>מסגרת חינוכית: {{ survey.educational_framework }}</p>
     <p>תיאור: {{ survey.description }}</p>
-    <a href="{{ url_for('edit_survey', survey_id=survey.id) }}" class="btn btn-warning">ערוך פרטים</a>
+    <a href="{{ url_for('survey.edit_survey', survey_id=survey.id) }}" class="btn btn-warning">ערוך פרטים</a>
   {% else %}
     <h2>לא הוזנו פרטים אישיים  </h2>
     <p>לא הוזנו פרטים עבור המשתמש הנוכחי.</p>
-    <a href="{{ url_for('survey') }}" class="btn btn-primary">הוסף פרטים אישיים </a>
+    <a href="{{ url_for('survey.survey') }}" class="btn btn-primary">הוסף פרטים אישיים </a>
   {% endif %}
   {% endblock %}
 </body>

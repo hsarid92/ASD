@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 {% block content %}
 <h2>Login</h2>
-<form method="POST" action="{{ url_for('login') }}">
+<form method="POST" action="{{ url_for('user.login') }}">
     <div class="mb-3">
         <label for="username" class="form-label">Username</label>
         <input type="text" class="form-control" id="username" name="username" required>
@@ -12,5 +12,5 @@
     </div>
     <button type="submit" class="btn btn-primary">Login</button>
 </form>
-<a href="{{ url_for('signup') }}">Don't have an account?</a>
+<a href="{{ url_for('user.signup') }}">Don't have an account?</a>
 {% endblock %}

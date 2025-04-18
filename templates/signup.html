@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 {% block content %}
 <h2>Sign Up</h2>
-<form method="POST" action="{{ url_for('signup') }}">
+<form method="POST" action="{{ url_for('user.signup') }}">
     <div class="mb-3">
         <label for="username" class="form-label">Username</label>
         <input type="text" class="form-control" id="username" name="username" required>
@@ -12,6 +12,6 @@
     </div>
     <button type="submit" class="btn btn-primary">Sign Up</button>
 </form>
-<p>אם כבר יש לך חשבון, <a href="{{ url_for('login') }}">לחץ כאן כדי להתחבר</a>.</p>
-<a href="{{ url_for('login') }}" class="btn btn-secondary">Log In</a>
+<p>אם כבר יש לך חשבון, <a href="{{ url_for('user.login') }}">לחץ כאן כדי להתחבר</a>.</p>
+<a href="{{ url_for('user.login') }}" class="btn btn-secondary">Log In</a>
 {% endblock %}

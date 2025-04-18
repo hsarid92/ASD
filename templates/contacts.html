@@ -8,7 +8,7 @@
         {% for contact in contacts %}
         <li>
             <strong>{{ contact.name }}</strong> - {{ contact.relation }} - {{ contact.phone_number }}
-            <a href="{{ url_for('delete_contact', contact_id=contact.id) }}" class="btn btn-danger" style="margin-left: 10px;">מחק</a>
+            <a href="{{ url_for('contact.delete_contact', contact_id=contact.id) }}" class="btn btn-danger" style="margin-left: 10px;">מחק</a>
         </li>
         {% endfor %}
     </ul>
@@ -17,7 +17,7 @@
 {% endif %}
 
 <h2>הוסף איש קשר חדש</h2>
-<form method="POST" action="{{ url_for('contacts') }}">
+<form method="POST" action="{{ url_for('contact.contacts') }}">
     <input type="hidden" name="contact_id" value="">
     <label for="name">שם:</label>
     <input type="text" id="name" name="name" required>
