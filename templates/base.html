@@ -24,6 +24,7 @@
                     {% if current_user.is_authenticated %}
                         <li class="nav-item"><a class="nav-link" href="{{ url_for('dashboard') }}">לוח בקרה</a></li>
                         <li class="nav-item"><a class="nav-link" href="{{ url_for('contacts_page') }}">אנשי קשר</a></li>
+                        <li class="nav-item"><a class="nav-link" href="{{ url_for('schedule') }}">לוח זמנים</a></li>
                         <li class="nav-item"><a class="nav-link" href="{{ url_for('logout') }}">התנתק</a></li>
                     {% else %}
                         <li class="nav-item"><a class="nav-link" href="{{ url_for('login') }}">התחבר</a></li>

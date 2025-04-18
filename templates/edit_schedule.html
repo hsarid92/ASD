@@ -1,0 +1,50 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container" {% if rtl %}dir="rtl"{% endif %}>
+    <h1 class="mb-4">{{ title }}</h1>
+    
+    <div class="card">
+        <div class="card-header">
+            <h2 class="mb-0">עריכת חלון זמן</h2>
+        </div>
+        <div class="card-body">
+            <form method="POST" action="{{ url_for('edit_schedule', schedule_id=entry.id) }}">
+                <div class="form-group mb-3">
+                    <label for="day_of_week" class="form-label"><strong>יום</strong></label>
+                    <select class="form-select" id="day_of_week" name="day_of_week" required>
+                        {% for day in days_of_week %}
+                        <option value="{{ day }}" {% if entry.day_of_week == day %}selected{% endif %}>{{ day }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                
+                <div class="form-group mb-3">
+                    <label for="time_slot" class="form-label"><strong>שעות</strong></label>
+                    <input type="text" class="form-control" id="time_slot" name="time_slot" value="{{ entry.time_slot }}" required>
+                </div>
+                
+                <!-- Add activity field -->
+                <div class="form-group mb-3">
+                    <label for="activity" class="form-label"><strong>פעילות</strong> (אופציונלי)</label>
+                    <input type="text" class="form-control" id="activity" name="activity" value="{{ entry.activity or '' }}" 
+                           placeholder="לדוגמה: שיעור פרטי, טיפול, טיול, ביקור משפחתי...">
+                </div>
+                
+                <div class="form-group mb-3">
+                    <label for="contact_id" class="form-label"><strong>איש קשר</strong> (אופציונלי)</label>
+                    <select class="form-select" id="contact_id" name="contact_id">
+                        <option value="">בחר איש קשר</option>
+                        {% for contact in contacts %}
+                        <option value="{{ contact.id }}" {% if entry.contact_id == contact.id %}selected{% endif %}>{{ contact.name }} ({{ contact.relation }})</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                
+                <button type="submit" class="btn btn-primary">שמור שינויים</button>
+                <a href="{{ url_for('schedule') }}" class="btn btn-secondary">ביטול</a>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,249 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container" {% if rtl %}dir="rtl"{% endif %}>
+    <h1 class="mb-4">{{ title }}</h1>
+    
+    <div class="card mb-4">
+        <div class="card-header">
+            <h2 class="mb-0">הוסף חלון זמן חדש</h2>
+        </div>
+        <div class="card-body">
+            <form method="POST" action="{{ url_for('schedule') }}">
+                <div class="form-group mb-3">
+                    <label for="days_of_week" class="form-label"><strong>בחר ימים</strong> (ניתן לסמן מספר ימים)</label>
+                    <div class="days-selection mb-3">
+                        {% for day in days_of_week %}
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="checkbox" name="days_of_week" id="day_{{ day }}" value="{{ day }}">
+                            <label class="form-check-label" for="day_{{ day }}">{{ day }}</label>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle"></i> סמן יותר מיום אחד כדי להוסיף את אותו חלון זמן לכל הימים שסומנו בבת אחת
+                    </div>
+                </div>
+                
+                <div class="form-group mb-3">
+                    <label for="time_slot" class="form-label"><strong>שעות</strong></label>
+                    <input type="text" class="form-control" id="time_slot" name="time_slot" required 
+                           placeholder="לדוגמה: 08:00-10:00">
+                </div>
+                
+                <!-- New activity field -->
+                <div class="form-group mb-3">
+                    <label for="activity" class="form-label"><strong>פעילות</strong> (אופציונלי)</label>
+                    <input type="text" class="form-control" id="activity" name="activity" 
+                           placeholder="לדוגמה: שיעור פרטי, טיפול, טיול, ביקור משפחתי...">
+                </div>
+                
+                <div class="form-group mb-3">
+                    <label for="contact_id" class="form-label"><strong>איש קשר</strong> (אופציונלי)</label>
+                    <select class="form-select" id="contact_id" name="contact_id">
+                        <option value="">בחר איש קשר</option>
+                        {% for contact in contacts %}
+                        <option value="{{ contact.id }}">{{ contact.name }} ({{ contact.relation }})</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                
+                <button type="submit" class="btn btn-primary btn-lg">הוסף חלונות זמן</button>
+            </form>
+        </div>
+    </div>
+    
+    <div class="card">
+        <div class="card-header">
+            <h2 class="mb-0">מערכת שבועית</h2>
+        </div>
+        <div class="card-body">
+            {% if schedule_entries %}
+            <div class="table-responsive">
+                <table class="table table-bordered timetable">
+                    <thead>
+                        <tr class="table-primary">
+                            <th style="width: 15%">שעות</th>
+                            {% for day in days_of_week %}
+                            <th>{{ day }}</th>
+                            {% endfor %}
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% if time_slots %}
+                            {% for time_slot in time_slots %}
+                            <tr>
+                                <td class="time-slot">{{ time_slot }}</td>
+                                {% for day in days_of_week %}
+                                    {% set entry = schedule_by_day_and_time.get((day, time_slot)) %}
+                                    <td class="schedule-cell {% if entry %}has-event{% endif %}">
+                                        {% if entry %}
+                                        <div class="schedule-entry">
+                                            <!-- Show activity if exists -->
+                                            {% if entry.activity %}
+                                            <div class="activity-title">{{ entry.activity }}</div>
+                                            {% endif %}
+                                            
+                                            {% if entry.contact %}
+                                            <div class="contact-name">{{ entry.contact.name }}</div>
+                                            <div class="contact-relation">({{ entry.contact.relation }})</div>
+                                            {% else %}
+                                            <div class="free-time">זמן פנוי</div>
+                                            {% endif %}
+                                            <div class="entry-actions mt-2">
+                                                <a href="{{ url_for('edit_schedule', schedule_id=entry.id) }}" class="btn btn-sm btn-warning">ערוך</a>
+                                                <form method="POST" action="{{ url_for('delete_schedule', schedule_id=entry.id) }}" style="display: inline;">
+                                                    <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('האם אתה בטוח שברצונך למחוק רשומה זו?');">מחק</button>
+                                                </form>
+                                            </div>
+                                        </div>
+                                        {% endif %}
+                                    </td>
+                                {% endfor %}
+                            </tr>
+                            {% endfor %}
+                        {% else %}
+                            <tr>
+                                <td colspan="{{ days_of_week|length + 1 }}" class="text-center">
+                                    אין חלונות זמן במערכת שלך. הוסף חלון זמן חדש למעלה.
+                                </td>
+                            </tr>
+                        {% endif %}
+                    </tbody>
+                </table>
+            </div>
+            
+            <h3 class="mt-4 mb-3">כל חלונות הזמן</h3>
+            <div class="table-responsive">
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>יום</th>
+                            <th>שעות</th>
+                            <th>פעילות</th>
+                            <th>איש קשר</th>
+                            <th>פעולות</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for entry in schedule_entries %}
+                        <tr>
+                            <td>{{ entry.day_of_week }}</td>
+                            <td>{{ entry.time_slot }}</td>
+                            <td>{{ entry.activity }}</td>
+                            <td>
+                                {% if entry.contact %}
+                                {{ entry.contact.name }} ({{ entry.contact.relation }})
+                                {% else %}
+                                -
+                                {% endif %}
+                            </td>
+                            <td>
+                                <div class="btn-group" role="group">
+                                    <a href="{{ url_for('edit_schedule', schedule_id=entry.id) }}" class="btn btn-sm btn-warning">ערוך</a>
+                                    <form method="POST" action="{{ url_for('delete_schedule', schedule_id=entry.id) }}" style="display: inline;">
+                                        <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('האם אתה בטוח שברצונך למחוק רשומה זו?');">מחק</button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <div class="alert alert-info">
+                אין חלונות זמן בלוח השנה שלך עדיין. הוסף חלון זמן חדש למעלה.
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<style>
+    /* Custom styling for checkboxes and RTL layout */
+    .days-selection {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+    
+    .form-check-input {
+        width: 20px;
+        height: 20px;
+        margin-left: 5px;
+    }
+    
+    .form-check-label {
+        font-size: 16px;
+        margin-right: 5px;
+    }
+    
+    /* Highlight selected checkboxes */
+    .form-check-input:checked + .form-check-label {
+        font-weight: bold;
+        color: #0d6efd;
+    }
+    
+    /* Timetable styling */
+    .timetable {
+        border-collapse: collapse;
+        width: 100%;
+    }
+    
+    .timetable th {
+        text-align: center;
+        font-weight: bold;
+    }
+    
+    .time-slot {
+        font-weight: bold;
+        text-align: center;
+        background-color: #f8f9fa;
+    }
+    
+    .schedule-cell {
+        height: 100px;
+        vertical-align: top;
+        padding: 8px;
+        border: 1px solid #dee2e6;
+    }
+    
+    .schedule-entry {
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+    }
+    
+    .has-event {
+        background-color: #e7f5ff;
+    }
+    
+    .activity-title {
+        font-weight: bold;
+        color: #0d6efd;
+        font-size: 16px;
+        margin-bottom: 5px;
+    }
+    
+    .contact-name {
+        font-weight: bold;
+        font-size: 14px;
+    }
+    
+    .contact-relation {
+        font-size: 12px;
+        color: #6c757d;
+    }
+    
+    .free-time {
+        font-style: italic;
+        color: #6c757d;
+    }
+    
+    .entry-actions {
+        margin-top: auto;
+    }
+</style>
+{% endblock %}
