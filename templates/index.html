@@ -2,13 +2,80 @@
 <html>
 <head><title>Home</title></head>
 <body>
-  {% extends "base.html" %}
+  {% extends 'base.html' %}
+
   {% block content %}
-  <div class="text-center">
-      <h1>Welcome to MyApp</h1>
-      <p>Your one-stop solution for user management.</p>
-      <a href="{{ url_for('signup') }}" class="btn btn-primary">Sign Up</a>
-      <a href="{{ url_for('login') }}" class="btn btn-secondary">Log In</a>
+  <div class="row align-items-center">
+      <div class="col-md-6 text-center">
+          <img src="{{ url_for('static', filename='img/logo.svg') }}" alt="Conduct Logo" class="img-fluid mb-4" style="max-width: 300px;">
+      </div>
+      <div class="col-md-6">
+          <h1 class="display-4 mb-4">ברוכים הבאים ל-Conduct</h1>
+          <p class="lead">
+              מערכת Conduct מסייעת להורים לילדים עם צרכים מיוחדים לנהל את מערך הטיפולים, אנשי קשר ולוח הזמנים באופן יעיל ונגיש.
+          </p>
+          <div class="mt-4">
+              {% if current_user.is_authenticated %}
+              <a href="{{ url_for('dashboard') }}" class="btn btn-primary btn-lg">לוח הבקרה שלי</a>
+              {% else %}
+              <a href="{{ url_for('signup') }}" class="btn btn-primary btn-lg me-2">הרשמה</a>
+              <a href="{{ url_for('login') }}" class="btn btn-outline-primary btn-lg">כניסה</a>
+              {% endif %}
+          </div>
+      </div>
+  </div>
+
+  <div class="row mt-5">
+      <div class="col-md-4 mb-4">
+          <div class="card h-100">
+              <div class="card-body text-center">
+                  <i class="fas fa-calendar-alt fa-3x mb-3 text-primary"></i>
+                  <h3>ניהול לוח זמנים</h3>
+                  <p>ארגון מפגשים, טיפולים ואירועים חשובים במערכת שבועית מסודרת</p>
+              </div>
+          </div>
+      </div>
+      <div class="col-md-4 mb-4">
+          <div class="card h-100">
+              <div class="card-body text-center">
+                  <i class="fas fa-address-book fa-3x mb-3 text-primary"></i>
+                  <h3>ניהול אנשי קשר</h3>
+                  <p>שמירה וארגון של פרטי אנשי הקשר המטפלים בילד</p>
+              </div>
+          </div>
+      </div>
+      <div class="col-md-4 mb-4">
+          <div class="card h-100">
+              <div class="card-body text-center">
+                  <i class="fas fa-clipboard-list fa-3x mb-3 text-primary"></i>
+                  <h3>מידע מאורגן</h3>
+                  <p>כל המידע החשוב על הילד במקום אחד, זמין ונגיש בכל עת</p>
+              </div>
+          </div>
+      </div>
+  </div>
+
+  <!-- AI Agent Feature -->
+  <div class="row mt-5">
+      <div class="col-12">
+          <div class="card bg-light mb-4">
+              <div class="card-body">
+                  <div class="row align-items-center">
+                      <div class="col-md-2 text-center">
+                          <i class="fas fa-robot fa-4x text-primary"></i>
+                      </div>
+                      <div class="col-md-10">
+                          <h3 class="card-title">סוכן בינה מלאכותית מתקדם</h3>
+                          <p class="card-text">
+                              מערכת Conduct כוללת סוכן AI חכם המסייע באיסוף וניתוח מידע, הכנת דוחות מקיפים, והצעת המלצות מותאמות אישית לטיפול בילד שלך.
+                              הסוכן החכם לומד את הצרכים הייחודיים ועוזר לקבל החלטות מבוססות נתונים.
+                          </p>
+                          <div class="badge bg-info text-white">בקרוב</div>
+                      </div>
+                  </div>
+              </div>
+          </div>
+      </div>
   </div>
   {% endblock %}
 </body>

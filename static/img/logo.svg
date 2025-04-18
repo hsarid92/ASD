@@ -1,0 +1,17 @@
+<!-- filepath: c:\Users\LARA_B\Desktop\LAB2\ASD\CODE\static\img\conduct-logo.svg -->
+<svg xmlns="http://www.w3.org/2000/svg" width="240" height="80" viewBox="0 0 240 80">
+  <!-- Background circle -->
+  <circle cx="40" cy="40" r="30" fill="#4a90e2" />
+  
+  <!-- Hand silhouette -->
+  <path d="M30,30 C35,25 45,25 50,35 C55,45 60,45 65,40" stroke="white" stroke-width="4" fill="none" stroke-linecap="round" />
+  
+  <!-- Text: Conduct -->
+  <text x="90" y="48" font-family="Arial, sans-serif" font-size="32" font-weight="bold" fill="#333333">Conduct</text>
+  
+  <!-- Tagline -->
+  <text x="92" y="65" font-family="Arial, sans-serif" font-size="12" fill="#666666">ניהול וליווי מותאם אישית</text>
+  
+  <!-- Heart accent -->
+  <path d="M50,40 C52,36 56,36 58,40 C60,36 64,36 66,40 C68,44 64,48 58,52 C52,48 48,44 50,40" fill="#e74c3c" />
+</svg>
