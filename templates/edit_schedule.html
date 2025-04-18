@@ -9,7 +9,7 @@
             <h2 class="mb-0">עריכת חלון זמן</h2>
         </div>
         <div class="card-body">
-            <form method="POST" action="{{ url_for('edit_schedule', schedule_id=entry.id) }}">
+            <form method="POST" action="{{ url_for('schedule.edit_schedule', schedule_id=entry.id) }}">
                 <div class="form-group mb-3">
                     <label for="day_of_week" class="form-label"><strong>יום</strong></label>
                     <select class="form-select" id="day_of_week" name="day_of_week" required>
@@ -42,7 +42,7 @@
                 </div>
                 
                 <button type="submit" class="btn btn-primary">שמור שינויים</button>
-                <a href="{{ url_for('schedule') }}" class="btn btn-secondary">ביטול</a>
+                <a href="{{ url_for('schedule.schedule') }}" class="btn btn-secondary">ביטול</a>
             </form>
         </div>
     </div>

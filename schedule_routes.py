@@ -1,6 +1,8 @@
 from flask import Blueprint, render_template, redirect, url_for, request, flash
 from flask_login import login_required, current_user
 from models import db, Schedule, Contact
+import re
+from datetime import datetime
 
 schedule_bp = Blueprint('schedule', __name__)
 
@@ -8,6 +10,19 @@ schedule_bp = Blueprint('schedule', __name__)
 @login_required
 def schedule():
     days_of_week = ["ראשון", "שני", "שלישי", "רביעי", "חמישי", "שישי", "שבת"]  # Translated to Hebrew
+    
+    # Define day range options
+    day_ranges = {
+        'all_days': {
+            'label': 'כל הימים',
+            'days': days_of_week
+        },
+        'sunday_to_thursday': {
+            'label': 'ראשון עד חמישי',
+            'days': days_of_week[:5]  # First 5 days (Sunday to Thursday)
+        }
+    }
+    
     contacts = Contact.query.filter_by(user_id=current_user.id).all()  # Fetch user contacts
     
     if request.method == 'POST':
@@ -31,6 +46,12 @@ def schedule():
             
         if not time_slot:
             flash('חובה להזין שעות')
+            return redirect(url_for('schedule.schedule'))
+            
+        # Validate time slot format (HH:MM-HH:MM)
+        time_format_pattern = r'^([0-1][0-9]|2[0-3]):([0-5][0-9])-([0-1][0-9]|2[0-3]):([0-5][0-9])$'
+        if not re.match(time_format_pattern, time_slot):
+            flash('פורמט השעות חייב להיות בתבנית: שעת התחלה: 08:00-שעת סיום: 09:00')
             return redirect(url_for('schedule.schedule'))
 
         # Validate all selected days
@@ -77,8 +98,16 @@ def schedule():
     # Get all schedule entries for the current user
     schedule_entries = Schedule.query.filter_by(user_id=current_user.id).all()
     
-    # Extract unique time slots and sort them
-    time_slots = sorted(set(entry.time_slot for entry in schedule_entries))
+    # Extract unique time slots
+    unique_time_slots = set(entry.time_slot for entry in schedule_entries)
+    
+    # Function to get start time for sorting
+    def get_start_time(time_slot):
+        start_time_str = time_slot.split('-')[0]
+        return datetime.strptime(start_time_str, '%H:%M')
+    
+    # Sort time slots by start time
+    time_slots = sorted(unique_time_slots, key=get_start_time)
     
     # Create a dictionary for quick lookup of entries by day and time
     schedule_by_day_and_time = {}
@@ -91,7 +120,8 @@ def schedule():
         schedule_entries=schedule_entries,
         days_of_week=days_of_week,
         time_slots=time_slots,  # Pass unique time slots
-        schedule_by_day_and_time=schedule_by_day_and_time,  # Pass the lookup dictionary
+        day_ranges=day_ranges,  # Pass the day ranges
+        schedule_by_day_and_time=schedule_by_day_and_time,
         contacts=contacts,
         rtl=True,
         align_right=True
