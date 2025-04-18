@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ title }}</title>
+</head>
+<body>
+    {% extends "base.html" %}
+    {% block content %}
+    <h1>אנשי קשר</h1>
+    <ul>
+        {% for contact in contacts %}
+        <li>
+            <strong>{{ contact.name }}</strong> - {{ contact.relation }} - {{ contact.phone_number }}
+        </li>
+        {% endfor %}
+    </ul>
+    <a href="{{ url_for('contacts') }}" class="btn btn-primary">ערוך אנשי קשר</a>
+    {% endblock %}
+</body>
+</html>

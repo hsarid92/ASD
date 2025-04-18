@@ -1,50 +1,34 @@
 {% extends "base.html" %}
 {% block content %}
-<h2>פרטי קשר</h2>
+<h1>אנשי קשר</h1>
 
-<form method="POST" action="{{ url_for('contacts') }}">
-    <div class="mb-3">
-        <label for="name" class="form-label">שם</label>
-        <input type="text" class="form-control" id="name" name="name" required>
-    </div>
-    <div class="mb-3">
-        <label for="relation" class="form-label">סוג קשר</label>
-        <select class="form-select" id="relation" name="relation" required>
-            <option value="Teacher">מורה</option>
-            <option value="Parent">הורה</option>
-            <option value="Therapist">מטפל</option>
-            <option value="Other">אחר</option>
-        </select>
-    </div>
-    <div class="mb-3">
-        <label for="phone_number" class="form-label">מספר טלפון</label>
-        <input type="text" class="form-control" id="phone_number" name="phone_number" required>
-    </div>
-    <div class="mb-3">
-        <label for="address" class="form-label">כתובת (אופציונלי)</label>
-        <input type="text" class="form-control" id="address" name="address">
-    </div>
-    <div class="mb-3">
-        <label for="time_with_child" class="form-label">זמן עם הילד (אופציונלי)</label>
-        <input type="text" class="form-control" id="time_with_child" name="time_with_child">
-    </div>
-    <button type="submit" class="btn btn-primary">הוסף פרטי קשר</button>
-</form>
-
-<h3>רשימת פרטי קשר</h3>
-<ul>
-    {% for contact in contacts %}
+{% if contacts %}
+    <h2>רשימת אנשי קשר</h2>
+    <ul>
+        {% for contact in contacts %}
         <li>
-            <strong>שם:</strong> {{ contact.name }}<br>
-            <strong>סוג קשר:</strong> {{ contact.relation }}<br>
-            <strong>מספר טלפון:</strong> {{ contact.phone_number }}<br>
-            <strong>כתובת:</strong> {{ contact.address or 'לא צוינה' }}<br>
-            <strong>זמן עם הילד:</strong> {{ contact.time_with_child or 'לא צוינה' }}<br>
-            <a href="{{ url_for('edit_contact', contact_id=contact.id) }}" class="btn btn-warning btn-sm">ערוך</a>
-            <form method="POST" action="{{ url_for('delete_contact', contact_id=contact.id) }}" style="display:inline;">
-                <button type="submit" class="btn btn-danger btn-sm">מחק</button>
-            </form>
+            <strong>{{ contact.name }}</strong> - {{ contact.relation }} - {{ contact.phone_number }}
+            <a href="{{ url_for('delete_contact', contact_id=contact.id) }}" class="btn btn-danger" style="margin-left: 10px;">מחק</a>
         </li>
-    {% endfor %}
-</ul>
+        {% endfor %}
+    </ul>
+{% else %}
+    <p>אין אנשי קשר כרגע.</p>
+{% endif %}
+
+<h2>הוסף איש קשר חדש</h2>
+<form method="POST" action="{{ url_for('contacts') }}">
+    <input type="hidden" name="contact_id" value="">
+    <label for="name">שם:</label>
+    <input type="text" id="name" name="name" required>
+    <label for="relation">קשר:</label>
+    <select id="relation" name="relation" required>
+        {% for relation in valid_relations %}
+        <option value="{{ relation }}">{{ relation }}</option>
+        {% endfor %}
+    </select>
+    <label for="phone_number">מספר טלפון:</label>
+    <input type="text" id="phone_number" name="phone_number" required>
+    <button type="submit" class="btn btn-primary">הוסף</button>
+</form>
 {% endblock %}

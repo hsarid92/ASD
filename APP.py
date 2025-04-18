@@ -42,8 +42,7 @@ class Contact(db.Model):
     name = db.Column(db.String(150), nullable=False)  # Name of the contact
     relation = db.Column(db.String(50), nullable=False)  # e.g., Teacher, Parent, Therapist
     phone_number = db.Column(db.String(20), nullable=False)
-    address = db.Column(db.String(255), nullable=True)
-    time_with_child = db.Column(db.String(100), nullable=True)  # e.g., "Monday 10:00-12:00"
+    # Removed address and time_with_child fields
 
 @login_manager.user_loader
 def load_user(user_id):
@@ -92,8 +91,33 @@ def logout():
 @login_required
 def dashboard():
     survey = Survey.query.filter_by(user_id=current_user.id).first()
-    contacts = Contact.query.filter_by(user_id=current_user.id).all()
-    return render_template('dashboard.html', title="Dashboard", username=current_user.username, survey=survey, contacts=contacts)
+    
+    # Translate gender, diagnosis, and educational framework to Hebrew
+    if survey:
+        gender_translation = {'Male': 'זכר', 'Female': 'נקבה'}
+        diagnosis_translation = {'Autism': 'אוטיזם', 'Other': 'אחר'}
+        framework_translation = {'Mainstream': 'חינוך רגיל'}
+        
+        survey.gender = gender_translation.get(survey.gender, survey.gender)
+        survey.diagnosis = diagnosis_translation.get(survey.diagnosis, survey.diagnosis)
+        survey.educational_framework = framework_translation.get(survey.educational_framework, survey.educational_framework)
+    
+    return render_template(
+        'dashboard.html', 
+        title="לוח בקרה", 
+        username=current_user.username, 
+        survey=survey,
+        labels={
+            'child_name': 'שם הילד',
+            'child_id': 'תעודת זהות',
+            'age': 'גיל',
+            'gender': 'מין',
+            'diagnosis': 'אבחנה',
+            'diagnosis_age': 'גיל באבחנה',
+            'educational_framework': 'מסגרת חינוכית',
+            'description': 'תיאור'
+        }
+    )
 
 @app.route('/survey', methods=['GET', 'POST'])
 @login_required
@@ -154,51 +178,48 @@ def edit_survey(survey_id):
 @app.route('/contacts', methods=['GET', 'POST'])
 @login_required
 def contacts():
+    valid_relations = ["מורה", "הורה", "מטפל", "קרוב משפחה", "אחר"]
     if request.method == 'POST':
+        contact_id = request.form.get('contact_id')
         name = request.form['name']
         relation = request.form['relation']
         phone_number = request.form['phone_number']
-        address = request.form.get('address', '')
-        time_with_child = request.form.get('time_with_child', '')
 
-        new_contact = Contact(
-            user_id=current_user.id,
-            name=name,
-            relation=relation,
-            phone_number=phone_number,
-            address=address,
-            time_with_child=time_with_child
-        )
-        db.session.add(new_contact)
-        db.session.commit()
-        flash('Contact added successfully!')
+        # Validate relation
+        if relation not in valid_relations:
+            flash('Invalid relation selected.')
+            return redirect(url_for('contacts'))
+
+        # Validate phone number
+        if not phone_number.startswith('05') or len(phone_number) != 10 or not phone_number.isdigit():
+            flash('Phone number must be 10 digits and start with "05".')
+            return redirect(url_for('contacts'))
+
+        if contact_id:  # Edit existing contact
+            contact = Contact.query.filter_by(id=contact_id, user_id=current_user.id).first()
+            if contact:
+                contact.name = name
+                contact.relation = relation
+                contact.phone_number = phone_number
+                db.session.commit()
+                flash('Contact updated successfully!')
+        else:  # Add new contact
+            new_contact = Contact(
+                user_id=current_user.id,
+                name=name,
+                relation=relation,
+                phone_number=phone_number
+            )
+            db.session.add(new_contact)
+            db.session.commit()
+            flash('Contact added successfully!')
+
         return redirect(url_for('contacts'))
 
     contacts = Contact.query.filter_by(user_id=current_user.id).all()
-    return render_template('contacts.html', title="פרטי קשר", contacts=contacts)
+    return render_template('contacts.html', title="אנשי קשר", contacts=contacts, valid_relations=valid_relations)
 
-@app.route('/edit_contact/<int:contact_id>', methods=['GET', 'POST'])
-@login_required
-def edit_contact(contact_id):
-    contact = Contact.query.filter_by(id=contact_id, user_id=current_user.id).first()
-    if not contact:
-        flash('Contact not found or you do not have permission to edit it.')
-        return redirect(url_for('contacts'))
-
-    if request.method == 'POST':
-        contact.name = request.form['name']
-        contact.relation = request.form['relation']
-        contact.phone_number = request.form['phone_number']
-        contact.address = request.form.get('address', '')
-        contact.time_with_child = request.form.get('time_with_child', '')
-
-        db.session.commit()
-        flash('Contact updated successfully!')
-        return redirect(url_for('contacts'))
-
-    return render_template('edit_contact.html', title="ערוך פרטי קשר", contact=contact)
-
-@app.route('/delete_contact/<int:contact_id>', methods=['POST'])
+@app.route('/delete_contact/<int:contact_id>', methods=['GET', 'POST'])
 @login_required
 def delete_contact(contact_id):
     contact = Contact.query.filter_by(id=contact_id, user_id=current_user.id).first()
@@ -206,21 +227,28 @@ def delete_contact(contact_id):
         flash('Contact not found or you do not have permission to delete it.')
         return redirect(url_for('contacts'))
 
-    # Confirm deletion
-    if 'confirm' in request.form and request.form['confirm'] == 'yes':
-        db.session.delete(contact)
-        db.session.commit()
-        flash('Contact deleted successfully!')
+    if request.method == 'POST':
+        if 'confirm' in request.form and request.form['confirm'] == 'yes':
+            db.session.delete(contact)
+            db.session.commit()
+            flash('Contact deleted successfully!')
+            return redirect(url_for('contacts'))
+        flash('Deletion canceled.')
         return redirect(url_for('contacts'))
 
-    flash('Deletion canceled.')
-    return redirect(url_for('edit_contact', contact_id=contact_id))
+    return render_template('confirm_delete.html', title="Confirm Delete", contact=contact)
 
 @app.route('/contacts_dashboard')
 @login_required
 def contacts_dashboard():
     contacts = Contact.query.filter_by(user_id=current_user.id).all()
     return render_template('contacts_dashboard.html', title="Contacts Dashboard", contacts=contacts)
+
+@app.route('/contacts_page')
+@login_required
+def contacts_page():
+    contacts = Contact.query.filter_by(user_id=current_user.id).all()
+    return render_template('contacts_page.html', title="אנשי קשר", contacts=contacts)
 
 if __name__ == '__main__':
     with app.app_context():
