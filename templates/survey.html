@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>{{ title }}</h2>
+<form method="POST" action="">
+    <div class="mb-3">
+        <label for="child_name" class="form-label">שם הילד</label>
+        <input type="text" class="form-control" id="child_name" name="child_name" value="{{ survey.child_name if survey else '' }}" required>
+    </div>
+    <div class="mb-3">
+        <label for="child_id" class="form-label">תעודת זהות</label>
+        <input type="text" class="form-control" id="child_id" name="child_id" value="{{ survey.child_id if survey else '' }}" required>
+    </div>
+    <div class="mb-3">
+        <label for="age" class="form-label">גיל</label>
+        <input type="number" class="form-control" id="age" name="age" value="{{ survey.age if survey else '' }}" required>
+    </div>
+    <div class="mb-3">
+        <label for="gender" class="form-label">מין</label>
+        <select class="form-select" id="gender" name="gender" required>
+            <option value="Male" {% if survey and survey.gender == 'Male' %}selected{% endif %}>זכר</option>
+            <option value="Female" {% if survey and survey.gender == 'Female' %}selected{% endif %}>נקבה</option>
+        </select>
+    </div>
+    <div class="mb-3">
+        <label for="diagnosis" class="form-label">אבחון</label>
+        <select class="form-select" id="diagnosis" name="diagnosis" required>
+            <option value="Autism" {% if survey and survey.diagnosis == 'Autism' %}selected{% endif %}>אוטיזם</option>
+            <option value="ADHD" {% if survey and survey.diagnosis == 'ADHD' %}selected{% endif %}>ADHD</option>
+            <option value="Learning Disability" {% if survey and survey.diagnosis == 'Learning Disability' %}selected{% endif %}>לקות למידה</option>
+        </select>
+    </div>
+    <div class="mb-3">
+        <label for="diagnosis_age" class="form-label">גיל אבחון</label>
+        <input type="number" class="form-control" id="diagnosis_age" name="diagnosis_age" value="{{ survey.diagnosis_age if survey else '' }}" required>
+    </div>
+    <div class="mb-3">
+        <label for="educational_framework" class="form-label">מסגרת חינוכית</label>
+        <select class="form-select" id="educational_framework" name="educational_framework" required>
+            <option value="Mainstream" {% if survey and survey.educational_framework == 'Mainstream' %}selected{% endif %}>חינוך רגיל</option>
+            <option value="Special Education" {% if survey and survey.educational_framework == 'Special Education' %}selected{% endif %}>חינוך מיוחד</option>
+        </select>
+    </div>
+    <div class="mb-3">
+        <label for="description" class="form-label">תיאור מצב הילד והקשיים</label>
+        <textarea class="form-control" id="description" name="description" rows="4">{{ survey.description if survey else '' }}</textarea>
+    </div>
+    <button type="submit" class="btn btn-primary">שלח</button>
+</form>
+{% endblock %}

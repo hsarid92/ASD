@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>{{ title }}</h2>
+
+<form method="POST" action="">
+    <div class="mb-3">
+        <label for="name" class="form-label">שם</label>
+        <input type="text" class="form-control" id="name" name="name" value="{{ contact.name }}" required>
+    </div>
+    <div class="mb-3">
+        <label for="relation" class="form-label">סוג קשר</label>
+        <select class="form-select" id="relation" name="relation" required>
+            <option value="Teacher" {% if contact.relation == 'Teacher' %}selected{% endif %}>מורה</option>
+            <option value="Parent" {% if contact.relation == 'Parent' %}selected{% endif %}>הורה</option>
+            <option value="Therapist" {% if contact.relation == 'Therapist' %}selected{% endif %}>מטפל</option>
+            <option value="Other" {% if contact.relation == 'Other' %}selected{% endif %}>אחר</option>
+        </select>
+    </div>
+    <div class="mb-3">
+        <label for="phone_number" class="form-label">מספר טלפון</label>
+        <input type="text" class="form-control" id="phone_number" name="phone_number" value="{{ contact.phone_number }}" required>
+    </div>
+    <div class="mb-3">
+        <label for="address" class="form-label">כתובת (אופציונלי)</label>
+        <input type="text" class="form-control" id="address" name="address" value="{{ contact.address }}">
+    </div>
+    <div class="mb-3">
+        <label for="time_with_child" class="form-label">זמן עם הילד (אופציונלי)</label>
+        <input type="text" class="form-control" id="time_with_child" name="time_with_child" value="{{ contact.time_with_child }}">
+    </div>
+    <button type="submit" class="btn btn-primary">עדכן פרטי קשר</button>
+</form>
+
+<hr>
+
+<!-- Delete Contact Section -->
+<form method="POST" action="{{ url_for('delete_contact', contact_id=contact.id) }}">
+    <p>Are you sure you want to delete this contact?</p>
+    <button type="submit" name="confirm" value="yes" class="btn btn-danger">Delete Contact</button>
+</form>
+{% endblock %}

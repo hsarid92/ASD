@@ -4,8 +4,65 @@
 <body>
   {% extends "base.html" %}
   {% block content %}
-  <h2>Welcome, {{ username }}!</h2>
-  <p>This is your dashboard. Manage your account here.</p>
+  <h2>ברוך הבא, {{ username }}!</h2>
+
+  {% if survey %}
+    <h3>פרטי הילד</h3>
+    <ul>
+        <li><strong>שם הילד:</strong> {{ survey.child_name }}</li>
+        <li><strong>תעודת זהות:</strong> {{ survey.child_id }}</li>
+        <li><strong>גיל:</strong> {{ survey.age }}</li>
+        <li><strong>מין:</strong> {{ survey.gender == 'Male' and 'זכר' or 'נקבה' }}</li>
+        <li><strong>אבחון:</strong> 
+            {% if survey.diagnosis == 'Autism' %}
+                אוטיזם
+            {% elif survey.diagnosis == 'ADHD' %}
+                ADHD
+            {% elif survey.diagnosis == 'Learning Disability' %}
+                לקות למידה
+            {% else %}
+                {{ survey.diagnosis }}
+            {% endif %}
+        </li>
+        <li><strong>גיל אבחון:</strong> {{ survey.diagnosis_age }}</li>
+        <li><strong>מסגרת חינוכית:</strong> 
+            {% if survey.educational_framework == 'Mainstream' %}
+                חינוך רגיל
+            {% elif survey.educational_framework == 'Special Education' %}
+                חינוך מיוחד
+            {% else %}
+                {{ survey.educational_framework }}
+            {% endif %}
+        </li>
+        <li><strong>תיאור:</strong> {{ survey.description }}</li>
+    </ul>
+    <a href="{{ url_for('edit_survey', survey_id=survey.id) }}" class="btn btn-warning">ערוך פרטים</a>
+  {% else %}
+    <p>לא נמצאו פרטי ילד. אנא מלא את הסקר.</p>
+    <a href="{{ url_for('survey') }}" class="btn btn-primary">מלא סקר</a>
+  {% endif %}
+
+  <h3>פרטי קשר</h3>
+  {% if contacts %}
+    <ul>
+        {% for contact in contacts %}
+            <li>
+                <strong>שם:</strong> {{ contact.name }}<br>
+                <strong>סוג קשר:</strong> {{ contact.relation }}<br>
+                <strong>מספר טלפון:</strong> {{ contact.phone_number }}<br>
+                <strong>כתובת:</strong> {{ contact.address or 'לא צוינה' }}<br>
+                <strong>זמן עם הילד:</strong> {{ contact.time_with_child or 'לא צוינה' }}<br>
+                <a href="{{ url_for('edit_contact', contact_id=contact.id) }}" class="btn btn-warning btn-sm">ערוך פרטי קשר</a>
+                <form method="POST" action="{{ url_for('delete_contact', contact_id=contact.id) }}" style="display:inline;">
+                    <button type="submit" class="btn btn-danger btn-sm">מחק</button>
+                </form>
+            </li>
+        {% endfor %}
+    </ul>
+  {% else %}
+    <p>לא נמצאו פרטי קשר. אנא הוסף פרטי קשר.</p>
+    <a href="{{ url_for('contacts') }}" class="btn btn-primary">הוסף פרטי קשר</a>
+  {% endif %}
   {% endblock %}
 </body>
 </html>

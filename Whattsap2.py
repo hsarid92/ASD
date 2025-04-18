@@ -10,7 +10,7 @@ import urllib.parse
 import time
 
 # Message & phone
-phone_number = "+972503900336"
+phone_number = "+************"  # Replace with the recipient's phone number
 message = "✅ Auto-message with working wait strategy"
 encoded_msg = urllib.parse.quote(message)
 url = f"https://web.whatsapp.com/send?phone={phone_number}&text={encoded_msg}"

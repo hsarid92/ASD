@@ -12,4 +12,6 @@
     </div>
     <button type="submit" class="btn btn-primary">Sign Up</button>
 </form>
+<p>אם כבר יש לך חשבון, <a href="{{ url_for('login') }}">לחץ כאן כדי להתחבר</a>.</p>
+<a href="{{ url_for('login') }}" class="btn btn-secondary">Log In</a>
 {% endblock %}
